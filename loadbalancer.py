@@ -7,7 +7,7 @@ print "Socket successfully created"
 
 # reserve a port on your computer in our
 # case it is 12345 but it can be anything
-port = 12345
+port = 6789
 
 # Next bind to the port
 # we have not typed any ip in the ip field
@@ -29,7 +29,18 @@ while True:
     print 'Got connection from', addr
 
     # send a thank you message to the client.
-    c.send('Thank you for connecting to server')
+    c.send('Thank you for connecting to load balancer')
+
+    s2 = socket.socket()
+    port2 = 12345
+
+    # connect to the server on local computer
+    s2.connect(('127.0.0.1', port2))
+
+    # receive data from the server
+    c.send(s2.recv(1024))
+    # close the connection
+    s.close()
 
     # Close the connection with the client
     c.close()
