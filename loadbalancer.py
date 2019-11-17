@@ -40,7 +40,7 @@ while True:
     # receive data from the server
     c.send(s2.recv(1024))
     # close the connection
-    s.close()
+    #s.close()
 
     # Close the connection with the client
     c.close()
