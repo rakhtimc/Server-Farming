@@ -1,6 +1,14 @@
 # first of all import the socket library
 import socket
 
+def bytes_to_number(b):
+    # if Python2.x
+    # b = map(ord, b)
+    res = 0
+    for i in range(4):
+        res += b[i] << (i*8)
+    return res
+
 # next create a socket object
 s = socket.socket()
 print "Socket successfully created"
@@ -37,8 +45,23 @@ while True:
     # connect to the server on local computer
     s2.connect(('127.0.0.1', port2))
 
+    size = s2.recv(16)  # assuming that the size won't be bigger then 1GB
+    print size
+    size = int(size)
+    current_size = 0
+    buffer = b""
+    while current_size < size:
+        data = s2.recv(1024)
+        if not data:
+            break
+        if len(data) + current_size > size:
+            data = data[:size - current_size]  # trim additional data
+        buffer += data
+        # you can stream here to disk
+        current_size += len(data)
+
     # receive data from the server
-    c.send(s2.recv(1024))
+    c.send(buffer.encode())
     # close the connection
     #s.close()
 

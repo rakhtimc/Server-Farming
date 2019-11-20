@@ -1,7 +1,9 @@
 # first of all import the socket library
+import os
 import socket
 import time
 import threading
+import sys
 from Queue import Queue
 
 # next create a socket object
@@ -12,6 +14,14 @@ numjobs = 10
 thread_queue = Queue()
 s = socket
 conns = []
+
+def convert_to_bytes(no):
+    result = bytearray()
+    result.append(no & 255)
+    for i in range(3):
+        no = no >> 8
+        result.append(no & 255)
+    return result
 
 def create_socket():
     global s
@@ -46,13 +56,6 @@ def listen_conn(sock):
 
         print 'Got connection from', addr
 
-        resp = ProcessRequest('')
-        c.send(resp.handleRequest())
-
-        # if len(conns) > 0 and (time.time() - st) > 2:
-        #     conns.pop()
-        #     st = time.time()
-
         conns.append(c)
         if len(conns) > numjobs:
             print 'Show Some Mercy on Server!!'
@@ -62,7 +65,20 @@ def listen_conn(sock):
             print 'Got connection from', addr
 
             resp = ProcessRequest('')
-            c.send(resp.handleRequest() + ', number of conns: ' + str(len(conns)))
+            # c.send(resp.handleRequest() + ', number of conns: ' + str(len(conns)))
+
+            resp = ProcessRequest('')
+            filename = resp.handleRequest()
+
+            if os.path.exists(filename):
+                length = os.path.getsize(filename)
+                print length
+                c.send(str(length))  # has to be 4 bytes
+                with open(filename, 'r') as infile:
+                    d = infile.read(1024)
+                    while d:
+                        c.send(d)
+                        d = infile.read(1024)
 
             if len(conns) > 0 and (time.time() - st) > 0.1:
                 conns.pop()
