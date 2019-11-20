@@ -49,36 +49,36 @@ def listen_conn(sock):
         resp = ProcessRequest('')
         c.send(resp.handleRequest())
 
-        if len(conns) > 0 and (time.time() - st) > 2:
-            conns.pop()
-            st = time.time()
+        # if len(conns) > 0 and (time.time() - st) > 2:
+        #     conns.pop()
+        #     st = time.time()
 
-        # conns.append(c)
-        # if len(conns) > 2:
-        #     print 'Show Some Mercy on Server!!'
-        #     c.send('Show Some Mercy on Server!!')
-        #     c.close()
-        # else:
-        #     print 'Got connection from', addr
-        #
-        #     resp = ProcessRequest('')
-        #     c.send(resp.handleRequest())
-        #
-        #     if len(conns) > 0 and (time.time() - st) > 2:
-        #         conns.pop()
-        #         st = time.time()
+        conns.append(c)
+        if len(conns) > numjobs:
+            print 'Show Some Mercy on Server!!'
+            c.send('Show Some Mercy on Server!!, number of conns: ' + str(len(conns)))
+            c.close()
+        else:
+            print 'Got connection from', addr
+
+            resp = ProcessRequest('')
+            c.send(resp.handleRequest() + ', number of conns: ' + str(len(conns)))
+
+            if len(conns) > 0 and (time.time() - st) > 0.1:
+                conns.pop()
+                st = time.time()
 
 def thread_work():
     for _ in range(numthreads):
         global s
         while True:
             x = thread_queue.get()
-            listen_conn(s)
-            # if x == 1:
-            #     s = create_socket()
-            #     listen_conn(s)
-            # elif x == 2:
-            #     listen_conn(s)
+            # listen_conn(s)
+            if x == 1:
+                s = create_socket()
+                listen_conn(s)
+            elif x == 2:
+                listen_conn(s)
 
             thread_queue.task_done()
 
@@ -95,9 +95,9 @@ def create_jobs():
     thread_queue.join()
 
 def main():
-    global s
-    s = create_socket()
-    listen_conn(s)
+    # global s
+    # s = create_socket()
+    # listen_conn(s)
     create_workers()
     create_jobs()
 
