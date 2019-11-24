@@ -9,9 +9,10 @@ port = 6789
 
 # connect to the server on local computer
 s.connect(('127.0.0.1', port))
+s.send(str(5).encode())
 
 # receive data from the server
 print s.recv(1024)
-print s.recv(1024)
+print str(s.recv(1024).decode())
 # close the connection
 s.close()
