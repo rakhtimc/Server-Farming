@@ -30,8 +30,8 @@ def create_socket():
     print "Socket successfully created"
 
     # reserve a port on your computer in our
-    # case it is 12345 but it can be anything
-    port = 12345
+    # case it is 12350 but it can be anything
+    port = 12350
 
     request_count = 0
     conns = []
