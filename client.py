@@ -13,6 +13,11 @@ s.send(str(5).encode())
 
 # receive data from the server
 print s.recv(1024)
-print str(s.recv(1024).decode())
+savefilename = 'fileatclient.txt'
+with open(savefilename,'wb') as file:
+    while True:
+        recvfile = s.recv(4096)
+        if not recvfile: break
+        file.write(recvfile)
 # close the connection
 s.close()

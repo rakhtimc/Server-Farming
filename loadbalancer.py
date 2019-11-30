@@ -211,26 +211,40 @@ while True:
             server_availability[final_server] = False
             c.send('\nServer is Busy, Please try after sometime\n')
         else:
-            size = s2.recv(64)  # assuming that the size won't be bigger then 1GB
-            print size
+            # size = s2.recv(64)  # assuming that the size won't be bigger then 1GB
+            # print size
             buffer = b""
             server_availability[final_server] = True
-            if size.isdigit():
-                size = int(size)
-                current_size = 0
-                while current_size < size:
-                    data = s2.recv(1024)
-                    if not data:
-                        break
-                    if len(data) + current_size > size:
-                        data = data[:size - current_size]  # trim additional data
-                    buffer += data
-                    # you can stream here to disk
-                    current_size += len(data)
-            else:
-                buffer = size
-            # receive data from the server
-            c.send(buffer.encode())
+            savefilename = 'filefromlb.txt'
+            with open(savefilename, 'wb') as file:
+                while True:
+                    recvfile = s2.recv(4096)
+                    print recvfile
+                    buffer += recvfile
+                    if not recvfile: break
+                    file.write(recvfile)
+
+            # with open(savefilename, 'rb') as file:
+            #     sendfile = file.read()
+            # if sendfile:
+            #     c.sendall(sendfile)
+            c.sendall(buffer)
+            # if size.isdigit():
+            #     size = int(size)
+            #     current_size = 0
+            #     while current_size < size:
+            #         data = s2.recv(1024)
+            #         if not data:
+            #             break
+            #         if len(data) + current_size > size:
+            #             data = data[:size - current_size]  # trim additional data
+            #         buffer += data
+            #         # you can stream here to disk
+            #         current_size += len(data)
+            # else:
+            #     buffer = size
+            # # receive data from the server
+            # c.send(buffer.encode())
             # Calculate response time
             resp_time = time.time() - st
             if server_resp_times[final_server] > 0:
