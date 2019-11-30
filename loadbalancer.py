@@ -1,4 +1,5 @@
 # first of all import the socket library
+import errno
 import socket
 import time
 import csv
@@ -216,13 +217,18 @@ while True:
             buffer = b""
             server_availability[final_server] = True
             savefilename = 'filefromlb.txt'
+            s2.setblocking(0)
             with open(savefilename, 'wb') as file:
                 while True:
-                    recvfile = s2.recv(4096)
-                    print recvfile
-                    buffer += recvfile
-                    if not recvfile: break
-                    file.write(recvfile)
+                    try:
+                        recvfile = s2.recv(4096)
+                        print recvfile
+                        buffer += recvfile
+                        if not recvfile: break
+                        file.write(recvfile)
+                    except socket.error, e:
+                        if e.args[0] == errno.EWOULDBLOCK:
+                            break
 
             # with open(savefilename, 'rb') as file:
             #     sendfile = file.read()
