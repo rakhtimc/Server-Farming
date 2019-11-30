@@ -1,6 +1,7 @@
 # first of all import the socket library
 import socket
 import time
+import csv
 
 server_cluster = {
     'c1': ['s1', 's2', 's3'],
@@ -165,16 +166,16 @@ while True:
     # 2nd Phase of algorithm
     if not final_server:
         available_servers = []
-        # TODO Extracting class of servers based on client IP
+        # Extracting class of servers based on client IP
         cluster_id = getserverlistbasedonclient(addr)
         server_list = server_cluster[cluster_id]
 
-        # TODO Iterate class of servers and determine available servers based on its availability and response time
+        # Iterate class of servers and determine available servers based on its availability and response time
         for server in server_list:
             if server_availability[server] and client_timeout > server_resp_times[server]:
                 available_servers.append(server)
 
-        # TODO Pick the server with highest efficiency
+        # Pick the server with highest efficiency
         max_efficiency = -1
         for server in available_servers:
             if server_resp_times[server] > 0 and server_busy_times[server][1] / server_resp_times[server] > max_efficiency:
@@ -184,7 +185,7 @@ while True:
         if final_server == '':
             c.send('\nAll servers are currently busy, please try again later\n')
     if final_server:
-        # TODO Get port for this server
+        # Get port for this server
         port2 = server_ports[final_server]
 
         # connect to the server on local computer
@@ -210,26 +211,40 @@ while True:
             server_availability[final_server] = False
             c.send('\nServer is Busy, Please try after sometime\n')
         else:
-            size = s2.recv(64)  # assuming that the size won't be bigger then 1GB
-            print size
+            # size = s2.recv(64)  # assuming that the size won't be bigger then 1GB
+            # print size
             buffer = b""
             server_availability[final_server] = True
-            if size.isdigit():
-                size = int(size)
-                current_size = 0
-                while current_size < size:
-                    data = s2.recv(1024)
-                    if not data:
-                        break
-                    if len(data) + current_size > size:
-                        data = data[:size - current_size]  # trim additional data
-                    buffer += data
-                    # you can stream here to disk
-                    current_size += len(data)
-            else:
-                buffer = size
-            # receive data from the server
-            c.send(buffer.encode())
+            savefilename = 'filefromlb.txt'
+            with open(savefilename, 'wb') as file:
+                while True:
+                    recvfile = s2.recv(4096)
+                    print recvfile
+                    buffer += recvfile
+                    if not recvfile: break
+                    file.write(recvfile)
+
+            # with open(savefilename, 'rb') as file:
+            #     sendfile = file.read()
+            # if sendfile:
+            #     c.sendall(sendfile)
+            c.sendall(buffer)
+            # if size.isdigit():
+            #     size = int(size)
+            #     current_size = 0
+            #     while current_size < size:
+            #         data = s2.recv(1024)
+            #         if not data:
+            #             break
+            #         if len(data) + current_size > size:
+            #             data = data[:size - current_size]  # trim additional data
+            #         buffer += data
+            #         # you can stream here to disk
+            #         current_size += len(data)
+            # else:
+            #     buffer = size
+            # # receive data from the server
+            # c.send(buffer.encode())
             # Calculate response time
             resp_time = time.time() - st
             if server_resp_times[final_server] > 0:
@@ -237,7 +252,13 @@ while True:
             else:
                 server_resp_times[final_server] = resp_time
             server_load[final_server] = int(flags.split(',')[0].split(':')[1])
-    print server_resp_times
+    with open('ServerResponseTimes', 'a') as respfile:
+        respobj = csv.writer(respfile, delimiter=':')
+        for resptime in server_resp_times.keys():
+            print resptime
+            respobj.writerow([resptime, server_resp_times[resptime]])
+
+    # print server_resp_times
     print server_busy_times
     print server_load
 
