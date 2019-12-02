@@ -7,7 +7,7 @@ class ProcessRequest:
 
     def __init__(self, type):
         self.objType = type
-        self.filename = '/Users/rohit/Documents/SBU/Sem1/FCN/Project/test.txt'
+        self.filename = r"C:\Users\Rakhtim Chatterjee\Desktop\adss.txt"
 
 
     def handleRequest(self):
