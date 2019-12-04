@@ -17,15 +17,15 @@ server_cluster = {
 }
 
 server_ip = {
-    's1': '127.0.0.1',
-    's2': '127.0.0.1',
-    's3': '127.0.0.1',
-    's4': '127.0.0.1',
-    's5': '127.0.0.1',
-    's6': '127.0.0.1',
-    's7': '127.0.0.1',
-    's8': '127.0.0.1',
-    's9': '127.0.0.1'
+    's1': '23.96.59.7', #Server1Machine
+    's2': '40.71.85.31', #S1M1
+    's3': '104.211.136.27', #S1M5
+    's4': '40.117.154.129', #S2M1
+    's5': '65.52.56.63', #S2M2
+    's6': '168.62.107.91', #S2M3
+    's7': '104.211.153.206', #S3M1
+    's8': '104.211.154.136', #S3M2
+    's9': '191.232.232.26' #S3M3
 }
 
 server_load = {
@@ -133,13 +133,13 @@ def bytes_to_number(b):
 def getserverlistbasedonclient(addr):
     cluster = ''
     ipquads = str(addr[0]).split('.')
-    if ipquads[0] == '127' and ipquads[1] == '0':
-        if ipquads[2] == '0':
-            cluster = 'c1'
-        elif ipquads[2] == '1':
-            cluster = 'c2'
-        elif ipquads[2] == '2':
-            cluster = 'c3'
+    # if ipquads[0] == '104' and ipquads[1] == '0':
+    if ipquads[0] == '104':
+        cluster = 'c1'
+    elif ipquads[0] == '23':
+        cluster = 'c2'
+    elif ipquads[0] == '40' or ipquads[0] == '129':
+        cluster = 'c3'
     return cluster
 
 def main():
@@ -240,25 +240,32 @@ def main():
                 # print size
                 buffer = b""
                 server_availability[final_server] = True
-                savefilename = 'filefromlb.txt'
+                print('Test 1')
+                savefilename = 'filefromlb.divx'
                 s2.setblocking(0)
                 with open(savefilename, 'wb') as file:
                     while True:
+                        time.sleep(2)
                         try:
+                            print('Test 2')
                             recvfile = s2.recv(4096)
                             print(recvfile)
                             buffer += recvfile
                             if not recvfile: break
                             file.write(recvfile)
+                            print('Test 3')
+                            # time.sleep(5)
                         except socket.error as e:
                             if e.args[0] == errno.EWOULDBLOCK:
+                                print("Haay error aa gaya")
                                 break
-
+                print('Test 4')
                 # with open(savefilename, 'rb') as file:
                 #     sendfile = file.read()
                 # if sendfile:
                 #     c.sendall(sendfile)
                 c.sendall(buffer)
+
                 # if size.isdigit():
                 #     size = int(size)
                 #     current_size = 0

@@ -7,12 +7,12 @@ def main():
     s = socket.socket()
     # Define the port on which you want to connect
     port = 6789
-    s.connect(('127.0.0.1', port))
+    s.connect(('23.96.58.37', port))
     s.send(str(5).encode())
 
     # receive data from the server
     print(s.recv(1024).decode())
-    savefilename = 'fileatclient.txt'
+    savefilename = 'fileatclient.divx'
     with open(savefilename,'wb') as file:
         while True:
             recvfile = s.recv(4096)

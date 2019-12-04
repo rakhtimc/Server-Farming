@@ -92,12 +92,11 @@ def listen_conn(sock):
                 length = os.path.getsize(filename)
                 print(length)
                 # flags = '127.0.0.1,NumConns:' + str(len(conns))
-                c.send(str(length).encode())  # has to be 4 bytes
-                with open(filename, 'r') as infile:
-                    d = infile.read(1024)
-                    while d:
-                        c.send(d.encode())
-                        d = infile.read(1024)
+                # c.send(str(length).encode())  # has to be 4 bytes
+                with open(filename, 'rb') as file:
+                    d = file.read()
+                if d:
+                    c.sendall(d)
 
 def thread_work():
     for _ in range(numthreads):
