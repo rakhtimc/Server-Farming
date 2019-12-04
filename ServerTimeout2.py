@@ -4,7 +4,7 @@ import socket
 import time
 import threading
 import sys
-from Queue import Queue
+from queue import Queue
 
 # next create a socket object
 from server import ProcessRequest
@@ -27,7 +27,7 @@ def convert_to_bytes(no):
 def create_socket():
     global s
     s = s.socket()
-    print "Socket successfully created"
+    print("Socket successfully created")
 
     # reserve a port on your computer in our
     # case it is 12346 but it can be anything
@@ -42,7 +42,7 @@ def create_socket():
     # this makes the server listen to requests
     # coming from other computers on the network
     s.bind(('', port))
-    print "socket binded to %s" % (port)
+    print("socket binded to %s" % (port))
     return s
 
 def listen_conn(sock):
@@ -53,7 +53,7 @@ def listen_conn(sock):
     # an error occurs
     while True:
         sock.listen(50)
-        print "socket is listening"
+        print("socket is listening")
 
         if len(conns) > 0 and (time.time() - st) > 0.01:
             conns.pop()
@@ -64,7 +64,7 @@ def listen_conn(sock):
         # Establish connection with client.
         c, addr = sock.accept()
 
-        print 'Got connection from', addr
+        print('Got connection from', addr)
 
         conns.append(c)
 
@@ -76,12 +76,12 @@ def listen_conn(sock):
         flags = 'NumConns:' + strconns
         if len(conns) > numjobs:
             flags += ',SB'
-            print 'Show Some Mercy on Server!!'
-            print flags
+            print('Show Some Mercy on Server!!')
+            print(flags)
             c.send(str(flags).encode())
             c.close()
         else:
-            print 'Got connection from', addr
+            print('Got connection from', addr)
             flags += ',NB'
 
             resp = ProcessRequest('')
@@ -90,14 +90,13 @@ def listen_conn(sock):
 
             if os.path.exists(filename):
                 length = os.path.getsize(filename)
-                print length
+                print(length)
                 # flags = '127.0.0.1,NumConns:' + str(len(conns))
-                c.send(str(length))  # has to be 4 bytes
-                with open(filename, 'r') as infile:
-                    d = infile.read(1024)
-                    while d:
-                        c.send(d)
-                        d = infile.read(1024)
+                # c.send(str(length).encode())  # has to be 4 bytes
+                with open(filename, 'rb') as file:
+                    d = file.read()
+                if d:
+                    c.sendall(d)
 
 def thread_work():
     for _ in range(numthreads):
