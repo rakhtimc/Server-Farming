@@ -241,11 +241,11 @@ def main():
                 buffer = b""
                 server_availability[final_server] = True
                 print('Test 1')
-                savefilename = 'filefromlb.divx'
+                savefilename = 'filefromlb.mp4'
                 s2.setblocking(0)
                 with open(savefilename, 'wb') as file:
                     while True:
-                        time.sleep(2)
+                        time.sleep(5)
                         try:
                             print('Test 2')
                             recvfile = s2.recv(4096)
